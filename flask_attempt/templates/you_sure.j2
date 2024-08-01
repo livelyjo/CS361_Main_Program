@@ -1,0 +1,11 @@
+<html>
+<head>
+    <title>You about deleting</title>
+</head>
+<body>
+    <h3>Are yo usure you want to delete this session?</h3>
+    <h3>Deleting a session is perminant and cannot be undone</h3>
+    <a href="{{ url_for('delete_session', id=session['id']) }}"><button>YES</button></a>
+    <a href="{{ url_for('update_session', id=session['id']) }}"><button>NO</button></a>
+</body>
+</html>

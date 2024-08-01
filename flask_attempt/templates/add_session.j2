@@ -1,0 +1,21 @@
+<html>
+<head>
+    <title>Add Session</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <h1><strong>Add Session</strong></h1>
+<form action="{{ url_for('save_session') }}" method="POST">
+    <label for="date">Date of Session: </label>
+    <input type="text" id="date" name="date" required><br>
+    <label for="gym">Gym Name: </label>
+    <input type="text" id="gym" name="gym" required><br>
+    <label for="focus">Area's of Focus: </label>
+    <input type="text" id="focus" name="focus" required><br>
+    <button title='Save and Add the session' type="submit">Save</button>
+</form>
+
+    <p></p>
+    <button title='Back' onClick="window.location.href=' {{url_for('root')}}'"><i class="fa-solid fa-arrow-left"></i></button>
+</body>
+</html>

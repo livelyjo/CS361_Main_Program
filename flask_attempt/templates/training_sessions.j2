@@ -1,0 +1,43 @@
+<html>
+<head>
+    <title>Training Sessions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <h1><strong>Training Sessions<strong></h1>
+    <table>
+    <thead>
+    <tr>
+        <th>Date</th>
+        <th>Gym</th>
+        <th>Focus</th>
+        <th>Matches</th>
+        <th>View</th>
+        <th>Update</th>
+        <th>Delete</th>
+    </tr>
+    <tbody>
+    {% for item in people %}
+    <tr>
+        <td>{{item['date']}}</td>
+        <td>{{item['gym']}}</td>
+        <td>{{item['focus']}}</td>
+        <td>
+        {% set ns = namespace(count = 0) %}
+        {% for match in matches%}
+            {% if match['session_id'] == item['id']%}
+                {% set ns.count = ns.count + 1 %}
+            {% endif %} 
+        {% endfor %}
+        {{ns.count}}
+        </td>
+        <td><a href="{{ url_for('session_details', id=item['id']) }}"><button title="View session details" ><i class="fa-solid fa-book-open"></i></button></a></td>
+        <td><a href="{{ url_for('update_session', id=item['id']) }}"><button title="Update a session"><i class="fa-solid fa-pen"></i></button></a></td>
+        <td><a href="{{ url_for('you_sure', id=item['id']) }}"><button title="Delete a session"><i class="fas fa-trash"></i></button></a></td>
+    </tr>
+    {% endfor %}
+    </thread>
+    </table>
+    <button title="Add a new session" onClick="window.location.href=' {{url_for('add_session')}}'"><i class="fa-solid fa-plus"></i></button> <a href=" {{url_for('step1_display') }}"><button title="Upload sessions in bulk with a CSV"><i class="fa-solid fa-arrow-up-from-bracket"></i></button></a>
+</body>
+</html>

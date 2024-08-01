@@ -1,0 +1,21 @@
+<html>
+<head>
+    <title>Step 1</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <h1>Step 1</h1>
+    <p>Select the csv file you would like to upload or enter its path.</p>
+    {% if file %}
+        <p>Current file: {{ file }}</p>
+    {% endif %}
+    <form action="/step1" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv" title="Browse Files">
+        <input type="submit" value="Upload" title="Upload CSV file">
+    </form>
+    <button title="Back" onClick="window.location.href=' {{url_for('root')}}'"><i class="fa-solid fa-arrow-left"></i></button>
+    {% if file %}
+        <button title="Forward" onClick="window.location.href=' {{url_for('step2')}}'"><i class="fa-solid fa-arrow-right"></i></button>
+    {% endif %}
+</body>
+</html>

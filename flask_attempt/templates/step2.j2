@@ -1,0 +1,25 @@
+
+<html>
+<head>
+    <title>Step 2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <h1>Step 2</h1>
+    <p>Match the CSV column headers with the attributes below:</p>
+    <form action="/step2" method="post">
+        {% if header_names|length == 0 %}
+            <label>"Date of Session: "</label> <input type="text" name="date">
+            <label>"Gym Name: "</label> <input type="text" name="gym">
+            <label>"Area's of Focus: "</label> <input type="text" name="focus">
+        {% else %}
+            <label>"Date of Session: "</label> <input type="text" name="date" value="{{header_names[0]}}">
+            <label>"Gym Name: "</label> <input type="text" name="gym" value="{{header_names[1]}}">
+            <label>"Area's of Focus: "</label> <input type="text" name="focus" value="{{header_names[2]}}">
+        {% endif %}
+        <button type="submit">Upload</button>
+    </form>
+    <a href="step1_display"><button title="Back"><i class="fa-solid fa-arrow-left"></i></button></a>
+    <button title="Forward" onClick="window.location.href=' {{url_for('step3')}}'"><i class="fa-solid fa-arrow-right"></i></button>
+</body>
+</html>

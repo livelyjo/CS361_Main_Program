@@ -1,0 +1,19 @@
+
+<html>
+<head>
+    <title>Step 3</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <h1>Step 3</h1>
+    <p>Please review your selection below and make sure they are correct.
+     Once you select <strong>Submit</strong> this action cannot be undone without manually removing sessions.</p>
+    <p>File: {{filename}}</p>
+    <p>Date of Session: {{headers[0]}}</p>
+    <p>Gym Name: {{headers[1]}}</p>
+    <p>Area's of Focus: {{headers[2]}}</p>
+    <form action="{{url_for('step4')}}" method="post"><button title="Add matches from CSV" type="submit">Submit</button></a>
+    </form>
+    <button title="Back" onClick="window.location.href=' {{url_for('step2')}}'"><i class="fa-solid fa-arrow-left"></i></button>
+</body>
+</html>
