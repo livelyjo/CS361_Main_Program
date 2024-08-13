@@ -5,13 +5,13 @@
 </head>
 <body>
     <h1><strong>Update Session<strong></h1>
-    <form action="{{ url_for('save_update_session', id=session['id']) }}" method="POST">
-        <p><label>Date of Session: </label> <input type="text" name="date" value="{{session['date']}}"></p>
-        <p><label>Gym Name: </lable> <input type="text" name="gym" value="{{session['gym']}}"></p>
-        <p><label>Area's of Focus: </lable> <input type="text" name="focus" value="{{session['focus']}}"></p>
+    <form action="{{ url_for('update_session', id=sessionResults[0]['sessionID']) }}" method="POST">
+        <p><label>Date of Session: </label> <input type="text" name="date" value="{{sessionResults[0]['sessionDate']}}"></p>
+        <p><label>Gym Name: </lable> <input type="text" name="gym" value="{{sessionResults[0]['gym']}}"></p>
+        <p><label>Area's of Focus: </lable> <input type="text" name="focus" value="{{sessionResults[0]['focus']}}"></p>
     <p>Matches:
-        {% for match in associated_matches %}
-            <a href="{{ url_for('update_match', id=session['id'], match_id=match['match_id']) }}">
+        {% for match in matchResults%}
+            <a href="{{ url_for('update_match', match_id=match['matchID']) }}">
                 <button title="Edit the match" type="button">{{ match['opponent'] }}</button>
             </a>
             {% if not loop.last %}, {% endif %}
@@ -19,10 +19,10 @@
     </p>
         <button title="Save changes to the session" type="submit">Save</button>
     </form>
-    <a href="{{ url_for('add_match', id=session['id']) }}"><button title="Add a match"><i class="fa-solid fa-plus"></i></button></a>
-    <a href="{{ url_for('add_bulk_match', id=session['id']) }}"><button title="Add multiple matches"><i class="fas fa-plus-square"></i></button></a>
+    <a href="{{ url_for('add_match', id=sessionResults[0]['sessionID'], count=-1) }}"><button title="Add a match"><i class="fa-solid fa-plus"></i></button></a>
+    <a href="{{ url_for('add_bulk_match', id=sessionResults[0]['sessionID']) }}"><button title="Add multiple matches"><i class="fas fa-plus-square"></i></button></a>
     <p></p>
     <button title="Back" onClick="window.location.href=' {{url_for('root')}}'"><i class="fa-solid fa-arrow-left"></i></button>
-    <a href="{{ url_for('you_sure', id=session['id']) }}"><button title="Delete the session"><i class="fas fa-trash"></i></button></a>
+    <a href="{{ url_for('you_sure', id=sessionResults[0]['sessionID']) }}"><button title="Delete the session"><i class="fas fa-trash"></i></button></a>
 </body>
 </html>

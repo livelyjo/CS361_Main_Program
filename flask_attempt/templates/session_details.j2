@@ -6,11 +6,11 @@
 </head>
 <body>
     <h1><strong>Session Details<strong></h1>
-    <a href="{{ url_for('update_session', id=session['id']) }}"><button title="Edit the session"><i class="fa-solid fa-pen"></i></button></a>
-    <p>Date of Session: {{session['date']}}<p>
-    <p>Gym Name: {{session['gym']}}<p>
-    <p>Area's of Focus: {{session['focus']}}<p>
-    <p>Matches: {% for match in associated_matches %} <a href="{{ url_for('match_details', id=session['id'], match_id=match['match_id']) }}"><button title="Details about the match">{{match['opponent']}}</button>, {% endfor %} <p>
+    <a href="{{ url_for('update_session', id=sessionResults[0]['sessionID']) }}"><button title="Edit the session"><i class="fa-solid fa-pen"></i></button></a>
+    <p>Date of Session: {{sessionResults[0]['sessionDate']}}<p>
+    <p>Gym Name: {{sessionResults[0]['gym']}}<p>
+    <p>Area's of Focus: {{sessionResults[0]['focus']}}<p>
+    <p>Matches: {% for match in matchResults %} <a href="{{ url_for('match_details', matchID=match['matchID']) }}"><button title="Details about the match">{{match['opponent']}}</button>, {% endfor %} <p>
     <a href="{{ url_for('root') }}"><button title="Back"><i class="fa-solid fa-arrow-left"></i></button>
 </body>
 </html>

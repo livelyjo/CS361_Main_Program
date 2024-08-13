@@ -6,11 +6,13 @@
 </head>
 <body>
     <h1><strong>Update Match</strong></h1>
-<form action="{{ url_for('save_update_match', id=match['session_id'], match_id=match['match_id']) }}" method="POST">
+<form action="{{ url_for('update_match', match_id=match['matchID']) }}" method="POST">
     <label for="opponent">Opponent: </label>
     <input type="text" id="opponent" name="opponent" value="{{match['opponent']}}"><br>
-    <label for="duration">Duration: </label>
-    <input type="text" id="duration" name="duration" value="{{match['duration']}}"><br>
+    <label for="matchMinutes">Match Minutes: </label>
+    <input type="number" id="matchMinutes" name="matchMinutes" value="{{matchMinutes}}"><br>
+    <label for="matchSeconds">Match Seconds: </label>
+    <input type="number" id="matchSeconds" name="matchSeconds" value="{{matchSeconds}}"><br>
     <label for="focus">Focus: </label>
     <input type="text" id="focus" name="focus" value="{{match['focus']}}"><br>
     <label for="notes">Notes: </label>
@@ -19,7 +21,7 @@
 </form>
 
     <p></p>
-    <button title="Back" onClick="window.location.href=' {{url_for('update_session', id=match['session_id'])}}'"><i class="fa-solid fa-arrow-left"></i></button>
-    <a href="{{ url_for('delete_match', id=match['session_id'], match_id=match['match_id'])}}"><button title="Delete match"><i class="fas fa-trash"></i></button></a>
+    <button title="Back" onClick="window.location.href=' {{url_for('update_session', id=match['sessionID'])}}'"><i class="fa-solid fa-arrow-left"></i></button>
+    <a href="{{ url_for('delete_match', match_id=match['matchID'])}}"><button title="Delete match"><i class="fas fa-trash"></i></button></a>
 </body>
 </html>

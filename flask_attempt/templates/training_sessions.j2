@@ -17,23 +17,24 @@
         <th>Delete</th>
     </tr>
     <tbody>
-    {% for item in people %}
+    {% for dict_item in sessionResults %}
     <tr>
-        <td>{{item['date']}}</td>
-        <td>{{item['gym']}}</td>
-        <td>{{item['focus']}}</td>
-        <td>
-        {% set ns = namespace(count = 0) %}
-        {% for match in matches%}
-            {% if match['session_id'] == item['id']%}
-                {% set ns.count = ns.count + 1 %}
-            {% endif %} 
+        <td>{{dict_item['sessionDate']}}</td>
+        <td>{{dict_item['gym']}}</td>
+        <td>{{dict_item['focus']}}</td>
+        {% set found = [] %}
+        {% for match_item in matchResults %}
+            {% if match_item['sessionID'] == dict_item['sessionID'] %}
+                <td>{{match_item['count']}}</td>
+                {% set _ = found.append(0) %}
+            {% endif %}
         {% endfor %}
-        {{ns.count}}
-        </td>
-        <td><a href="{{ url_for('session_details', id=item['id']) }}"><button title="View session details" ><i class="fa-solid fa-book-open"></i></button></a></td>
-        <td><a href="{{ url_for('update_session', id=item['id']) }}"><button title="Update a session"><i class="fa-solid fa-pen"></i></button></a></td>
-        <td><a href="{{ url_for('you_sure', id=item['id']) }}"><button title="Delete a session"><i class="fas fa-trash"></i></button></a></td>
+        {% if found|length == 0 %}
+            <td>0</td>
+        {% endif %}
+        <td><a href="{{ url_for('session_details', id=dict_item['sessionID']) }}"><button title="View session details" ><i class="fa-solid fa-book-open"></i></button></a></td>
+        <td><a href="{{ url_for('update_session', id=dict_item['sessionID']) }}"><button title="Update a session"><i class="fa-solid fa-pen"></i></button></a></td>
+        <td><a href="{{ url_for('you_sure', id=dict_item['sessionID']) }}"><button title="Delete a session"><i class="fas fa-trash"></i></button></a></td>
     </tr>
     {% endfor %}
     </thread>

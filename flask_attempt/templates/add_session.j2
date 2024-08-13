@@ -5,9 +5,9 @@
 </head>
 <body>
     <h1><strong>Add Session</strong></h1>
-<form action="{{ url_for('save_session') }}" method="POST">
+<form action="{{ url_for('add_session') }}" method="POST">
     <label for="date">Date of Session: </label>
-    <input type="text" id="date" name="date" required><br>
+    <input type="date" id="date" name="date" required><br>
     <label for="gym">Gym Name: </label>
     <input type="text" id="gym" name="gym" required><br>
     <label for="focus">Area's of Focus: </label>

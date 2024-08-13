@@ -5,11 +5,13 @@
 </head>
 <body>
     <h1><strong>Add Match</strong></h1>
-<form action="{{ url_for('save_match', id=match_session['id']) }}" method="POST">
+<form action="{{ url_for('add_match', id=match_session, count=count) }}" method="POST">
     <label for="opponent">Opponent: </label>
     <input type="text" id="opponent" name="opponent" required><br>
-    <label for="duration">Duration: </label>
-    <input type="text" id="duration" name="duration" required><br>
+    <label for="matchMintues">Match Minutes: </label>
+    <input type="number" id="matchMinutes" name="matchMinutes" required><br>
+    <label for="matchSeconds">Match Seconds: </label>
+    <input type="number" id="matchSeconds" name="matchSeconds" required><br>
     <label for="focus">Focus: </label>
     <input type="text" id="focus" name="focus" required><br>
     <label for="notes">Notes: </label>
@@ -18,6 +20,6 @@
 </form>
 
     <p></p>
-    <button title="Back" onClick="window.location.href=' {{url_for('update_session', id=match_session['id'])}}'"><i class="fa-solid fa-arrow-left"></i></button>
+    <button title="Back" onClick="window.location.href=' {{url_for('update_session', id=match_session)}}'"><i class="fa-solid fa-arrow-left"></i></button>
 </body>
 </html>
