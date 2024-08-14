@@ -6,10 +6,6 @@ import db_connector as db
 
 db_connection = db.connect_to_database()
 
-training_sessions =[]
-
-matches = []
-
 datafile = None
 
 app = Flask(__name__)
@@ -17,72 +13,46 @@ app.secret_key = 'hello'
 
 @app.route('/')
 def root():
-    global db_connection
-    db_connection = db.connect_to_database()
-    query = "SHOW tables;"
-    cursor = db.execute_query(db_connection=db_connection, query=query)
-    results = cursor.fetchall()
-    if len(results) < 1:
-        with open('DDL.sql', 'r') as file:
-            sql_commands = file.read()
-        commands = sql_commands.split(';')
-        for command in commands:
-            if command.strip():
-                db.execute_query(db_connection=db_connection, query=command)
-
-    query = "SELECT * FROM TrainingSessions"
-    cursor = db.execute_query(db_connection=db_connection, query=query)
-    sessionResults = cursor.fetchall()
-    print(sessionResults)
-    query = "SELECT sessionID, COUNT(*) as count FROM Matches GROUP BY sessionID"
-    cursor = db.execute_query(db_connection=db_connection, query=query)
-    matchResults = cursor.fetchall()
+    requests.get("http://127.0.0.1:9113/create-db")
+    results = requests.get("http://127.0.0.1:9113/display-sessions")
+    results = results.json()
+    sessionResults = results[0]
+    matchResults = results[1]
     return render_template("training_sessions.j2", sessionResults=sessionResults, matchResults=matchResults)
 
 @app.route('/add_session', methods=['GET', 'POST'])
 def add_session():
     if request.method == 'POST':
-        sessionDate = request.form.get('date')
-        gym = request.form.get('gym')
-        focus = request.form.get('focus')
-        query = f"INSERT INTO TrainingSessions(sessionDate, gym, focus)VALUES('{sessionDate}', '{gym}', '{focus}')"
-        cursor = db.execute_query(db_connection=db_connection, query=query)
+        response = requests.post("http://127.0.0.1:9114/insert-session", data=request.form)
+        print(response)
         return redirect(url_for('root'))
     else:
         return render_template('add_session.j2')
 
 @app.route('/session_details/<int:id>')
 def session_details(id):
-    query = f"SELECT * FROM TrainingSessions where sessionID={id}"
-    cursor = db.execute_query(db_connection=db_connection, query=query)
-    sessionResults = cursor.fetchall()
-    query = f"SELECT matchID, opponent, sessionID FROM Matches where sessionID={id}"
-    cursor = db.execute_query(db_connection=db_connection, query=query)
-    matchResults = cursor.fetchall()
+    results = requests.get(f"http://127.0.0.1:9113/display-session/{id}")
+    results = results.json()
+    sessionResults = results[0]
+    print(sessionResults)
+    matchResults = results[1]
     return render_template('session_details.j2', sessionResults=sessionResults, matchResults=matchResults)
 
 @app.route('/update_session/<int:id>', methods=['GET', 'POST'])
 def update_session(id):
     if request.method == 'POST':
-        sessionDate = request.form.get('date')
-        gym = request.form.get('gym')
-        focus = request.form.get('focus')
-        query = f"UPDATE TrainingSessions SET sessionDate='{sessionDate}', gym='{gym}', focus='{focus}' WHERE sessionID={id}"
-        cursor = db.execute_query(db_connection=db_connection, query=query)
+        response = requests.post(f"http://127.0.0.1:9114/update-session/{id}", data=request.form)
         return redirect(url_for('root'))
     else:
-        query = f"SELECT * FROM TrainingSessions where sessionID={id}"
-        cursor = db.execute_query(db_connection=db_connection, query=query)
-        sessionResults = cursor.fetchall()
-        query = f"SELECT matchID, opponent, sessionID FROM Matches where sessionID={id}"
-        cursor = db.execute_query(db_connection=db_connection, query=query)
-        matchResults = cursor.fetchall()
+        results = requests.get(f"http://127.0.0.1:9113/display-session/{id}")
+        results = results.json()
+        sessionResults = results[0]
+        matchResults = results[1]
         return render_template('update_session.j2', sessionResults=sessionResults, matchResults=matchResults)
 
 @app.route('/delete_session/<int:id>')
 def delete_session(id):
-    query = f"DELETE FROM TrainingSessions WHERE sessionID={id}"
-    cursor = db.execute_query(db_connection=db_connection, query=query)
+    response = requests.post(f"http://127.0.0.1:9115/delete-session", data={'delete':id})
     return redirect(url_for('root'))
 
 @app.route('/you_sure/<int:id>')
@@ -91,111 +61,62 @@ def you_sure(id):
 
 @app.route('/delete_match/<int:match_id>')
 def delete_match(match_id):
-    query = f"SELECT sessionID FROM Matches WHERE matchID={match_id}"
-    cursor = db.execute_query(db_connection=db_connection, query=query)
-    match = cursor.fetchall()
-    match, = match
-    query = f"DELETE FROM Matches WHERE matchID={match_id}"
-    cursor = db.execute_query(db_connection=db_connection, query=query)
-    return redirect(url_for('update_session', id=match["sessionID"]))
+    response = requests.post(f"http://127.0.0.1:9115/delete-match", data={'match_id':match_id})
+    match = response.json()
+    print(match)
+    return redirect(url_for('update_session', id=match[0]["sessionID"]))
 
-@app.route('/add_match/<int:id><int:count>', methods=['GET', 'POST'])
-def add_match(id, count):
+@app.route('/add_match/<int:id>', methods=['GET', 'POST'])
+def add_match(id):
     if request.method == 'POST':
-        opponent = request.form.get('opponent')
-        matchMinutes = int(request.form.get('matchMinutes'))
-        matchSeconds = int(request.form.get('matchSeconds'))
-        focus = request.form.get('focus')
-        notes = request.form.get('notes')
-        matchHours = 0
-        while matchMinutes >= 60:
-            matchHours += 1
-            matchMinutes -= 60
-        if matchHours < 10:
-            matchHours = "0"+str(matchHours)
-        else:
-            matchHours = str(matchHours)
-        if matchMinutes < 10:
-            matchMinutes = "0"+str(matchMinutes)
-        else:
-            matchMinutes = str(matchMinutes)
-        if matchSeconds < 10:
-            matchSeconds = "0"+str(matchSeconds)
-        else:
-            matchSeconds = str(matchSeconds)
-        query = f"INSERT INTO Matches(opponent, duration, focus, notes, sessionID)VALUES('{opponent}', '{matchHours}:{matchMinutes}:{matchSeconds}', '{focus}', '{notes}', {id})"
-        cursors = db.execute_query(db_connection=db_connection, query=query)
-        if count != -1:
-            count -= 1
-        if count == -1 or count == 0:
+        response = requests.post(f"http://127.0.0.1:9114/insert-match/{id}", data=request.form)
+        return redirect(url_for('update_session', id=id))
+    else:
+        return render_template('add_match.j2', match_session=id)
+
+@app.route('/add_multiple_matches/<int:id>/<int:count>', methods=['GET', 'POST'])
+def add_multiple_matches(id, count):
+    if request.method == 'POST':
+        response = requests.post(f"http://127.0.0.1:9114/insert-match/{id}", data=request.form)
+        count -= 1
+        if count == 0:
             return redirect(url_for('update_session', id=id))
         else:
             return render_template('add_match_special.j2', match_session=id, count=count)
     else:
-        if count == -1:
-            return render_template('add_match.j2', match_session=id)
-        else:
-            return render_template('add_match_special.j2', match_session=id, count=count)
-
+        return render_template('add_match_special.j2', match_session=id, count=count)
 
 @app.route('/add_bulk_match/<int:id>', methods=['GET', 'POST'])
 def add_bulk_match(id):
     if request.method == 'POST':
         count = request.form.get('bulk_num')
-        return redirect(url_for('add_match', id=id, count=count))
+        return redirect(url_for('add_multiple_matches', id=id, count=count))
     else:
         return render_template('add_bulk_matches.j2', session=id)
 
 @app.route('/update_match/<int:match_id>', methods=['GET', 'POST'])
 def update_match(match_id):
     if request.method == 'POST':
-        opponent = request.form.get('opponent')
-        matchMinutes = int(request.form.get('matchMinutes'))
-        matchSeconds = int(request.form.get('matchSeconds'))
-        focus = request.form.get('focus')
-        notes = request.form.get('notes')
-        matchHours = 0
-        while matchMinutes >= 60:
-            matchHours += 1
-            matchMinutes -= 60
-        if matchHours < 10:
-            matchHours = "0"+str(matchHours)
-        else:
-            matchHours = str(matchHours)
-        if matchMinutes < 10:
-            matchMinutes = "0"+str(matchMinutes)
-        else:
-            matchMinutes = str(matchMinutes)
-        if matchSeconds < 10:
-            matchSeconds = "0"+str(matchSeconds)
-        else:
-            matchSeconds = str(matchSeconds)
-        query = f"UPDATE Matches SET opponent='{opponent}', duration='{matchHours}:{matchMinutes}:{matchSeconds}', focus='{focus}', notes='{notes}' WHERE matchID={match_id}"
-        cursors = db.execute_query(db_connection=db_connection, query=query)
-        query = f"SELECT sessionID FROM Matches WHERE matchID={match_id}"
-        cursors = db.execute_query(db_connection=db_connection, query=query)
-        sessionID = cursors.fetchall()
-        sessionID, = sessionID
-        return redirect(url_for('update_session', id=sessionID['sessionID']))
-        # 0:00:00
+        response = requests.post(f"http://127.0.0.1:9114/update-match/{match_id}", data=request.form)
+        response = response.json()
+        print(response)
+        return redirect(url_for('update_session', id=response[0]['sessionID']))
     else:
-        query = f"SELECT * from Matches WHERE matchID={match_id}"
-        cursor = db.execute_query(db_connection=db_connection,query=query)
-        results = cursor.fetchall()
-        results, = results
+        results = requests.get(f"http://127.0.0.1:9113/display-match/{match_id}")
+        results = results.json()
+        results = results[0]
         duration = str(results['duration'])
-        matchHours = int(duration[0])
-        matchMinutes = int(duration[2:4])
-        matchSeconds = int(duration[5:7])
+        matchHours = int(duration[0:2])
+        matchMinutes = int(duration[3:5])
+        matchSeconds = int(duration[6:8])
         matchMinutes += matchHours * 60
         return render_template('update_match.j2', match=results, matchMinutes=matchMinutes, matchSeconds=matchSeconds)
 
 @app.route('/match_details/<int:matchID>')
 def match_details(matchID):
-    query = f"SELECT * FROM Matches WHERE matchID={matchID}"
-    cursor = db.execute_query(db_connection=db_connection, query=query)
-    results = cursor.fetchall()
-    results, = results
+    results = requests.get(f"http://127.0.0.1:9113/display-match/{matchID}")
+    results = results.json()
+    results = results[0]
     return render_template('match_details.j2', results=results)
 
 @app.route('/step1_display', methods=['GET'])
@@ -263,8 +184,7 @@ def step4():
         date = response['date-converted']
         gym = data[header_names[1]]
         focus = data[header_names[2]]
-        query = f"INSERT INTO TrainingSessions(sessionDate, gym, focus)VALUES('{date}', '{gym}', '{focus}')"
-        db.execute_query(db_connection=db_connection, query=query)
+        response = requests.post("http://127.0.0.1:9114/insert-session", data={'date':date, 'gym':gym, 'focus':focus})
     
     session.pop('csv_data', None)
     session.pop('header_names', None)
@@ -278,6 +198,4 @@ def step4():
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 9112))
-
-
     app.run(port=port, debug=True)
